@@ -5,12 +5,8 @@ const cors = require("cors")({ origin: true });
 admin.initializeApp();
 const db = admin.firestore();
 
-// ── Pollinations key stored in Firebase config (never in source code) ──
-// Set with: firebase functions:config:set pollinations.key="sk_..."
-const PKEY = () =>
-    (functions.config().pollinations && functions.config().pollinations.key) ||
-    process.env.POLLINATIONS_KEY ||
-    "";
+// ── Pollinations key stored in .env ──
+const PKEY = () => process.env.POLLINATIONS_KEY || "";
 
 // ════════════════════════════════════════════════════
 //  1. CHAT  —  POST /chat
