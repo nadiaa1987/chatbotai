@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AgentChat — Créer votre Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a28;
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh
+        }
+
+        /* NAV */
+        nav {
+            height: 60px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px
+        }
+
+        .logo span {
+            color: var(--primary-light)
+        }
+
+        .nav-back {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .15s
+        }
+
+        .nav-back:hover {
+            color: var(--text)
+        }
+
+        /* LAYOUT */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            min-height: calc(100vh - 60px)
+        }
+
+        /* FORM SIDE */
+        .form-side {
+            padding: 36px 40px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border)
+        }
+
+        .form-side h1 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px
+        }
+
+        .form-side .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 32px
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 18px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: .3px
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+            line-height: 1.5
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary)
+        }
+
+        .form-group select option {
+            background: #1a1a28
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--muted)
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .color-row input[type=color] {
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 2px;
+            background: var(--surface2);
+            cursor: pointer
+        }
+
+        .color-row input[type=text] {
+            flex: 1
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px
+        }
+
+        .radio-opt {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: border-color .15s, background .15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .radio-opt:hover {
+            border-color: var(--primary-light)
+        }
+
+        .radio-opt.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1)
+        }
+
+        .radio-opt input {
+            display: none
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            transition: transform .15s, box-shadow .15s;
+            margin-top: 8px
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5)
+        }
+
+        /* PREVIEW SIDE */
+        .preview-side {
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .preview-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preview-tabs {
+            display: flex;
+            gap: 0
+        }
+
+        .p-tab {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            background: none;
+            font-family: inherit;
+            transition: all .15s;
+        }
+
+        .p-tab:first-child {
+            border-radius: 8px 0 0 8px
+        }
+
+        .p-tab:last-child {
+            border-radius: 0 8px 8px 0
+        }
+
+        .p-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary)
+        }
+
+        .preview-body {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        /* Chat preview */
+        .chat-preview-wrap {
+            background: #f8fafc;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .cp-header {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cp-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .cp-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .cp-status {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .75);
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .cp-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ade80
+        }
+
+        .cp-messages {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f8fafc
+        }
+
+        .cp-msg {
+            display: flex;
+            gap: 6px;
+            align-items: flex-end
+        }
+
+        .cp-msg.user {
+            flex-direction: row-reverse
+        }
+
+        .cp-msg-av {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0
+        }
+
+        .cp-msg.bot .cp-msg-av {
+            background: var(--preview-color, #6366f1);
+            color: #fff
+        }
+
+        .cp-msg.user .cp-msg-av {
+            background: #64748b;
+            color: #fff
+        }
+
+        .cp-bubble {
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+            max-width: 75%
+        }
+
+        .cp-msg.bot .cp-bubble {
+            background: #fff;
+            color: #1e293b;
+            border-bottom-left-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08)
+        }
+
+        .cp-msg.user .cp-bubble {
+            background: var(--preview-color, #6366f1);
+            color: #fff;
+            border-bottom-right-radius: 3px
+        }
+
+        .cp-input-row {
+            padding: 10px 12px;
+            display: flex;
+            gap: 8px;
+            background: #fff;
+            border-top: 1px solid #f1f5f9;
+            align-items: center
+        }
+
+        .cp-inp {
+            flex: 1;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 11px;
+            color: #94a3b8
+        }
+
+        .cp-send {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        /* Code section */
+        #code-section {
+            display: none
+        }
+
+        .code-wrap {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden
+        }
+
+        .code-top {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, .04);
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 5px
+        }
+
+        .cd {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .code-label {
+            margin-left: auto;
+            font-family: monospace;
+            font-size: 11px
+        }
+
+        pre.embed-code {
+            padding: 20px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-x: auto;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-all
+        }
+
+        .copy-btn {
+            width: calc(100% - 32px);
+            margin: 0 16px 16px;
+            padding: 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background .15s
+        }
+
+        .copy-btn:hover {
+            background: rgba(99, 102, 241, 0.25)
+        }
+
+        /* Database log */
+        .db-section {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden
+        }
+
+        .db-header {
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px
+        }
+
+        .db-table th {
+            padding: 8px 12px;
+            text-align: left;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .db-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text)
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .db-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03)
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block
+        }
+
+        .badge.new {
+            background: rgba(34, 197, 94, .15);
+            color: #22c55e
+        }
+
+        .badge.confirmed {
+            background: rgba(99, 102, 241, .15);
+            color: var(--primary-light)
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: inherit;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+            opacity: 0;
+            transition: opacity .2s, transform .2s;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0)
+        }
+
+        @media(max-width:900px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+
+            .preview-side {
+                min-height: 500px
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtbKDENWauCXgydB8Sooygdyelx4oU48o",
+            authDomain: "ai-agent-chatbot-4f4b8.firebaseapp.com",
+            projectId: "ai-agent-chatbot-4f4b8",
+            storageBucket: "ai-agent-chatbot-4f4b8.firebasestorage.app",
+            messagingSenderId: "861130696957",
+            appId: "1:861130696957:web:17be3be2524486dd4f3694",
+        };
+        const fireApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fireApp);
+        window._db = db;
+        window._firestoreOps = { doc, setDoc, collection, getDocs, query, where, orderBy, limit };
+    </script>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">🤖</div>
+            Agent<span>Chat</span>
+        </div>
+        <a href="index.html" class="nav-back">← Retour au site</a>
+    </nav>
+
+    <div class="layout">
+
+        <!-- ═══════════ FORM SIDE ═══════════ -->
+        <div class="form-side">
+            <h1>🛠️ Créer votre Chatbot</h1>
+            <p class="subtitle">Remplissez les informations de votre business pour générer votre code d'intégration.</p>
+
+            <!-- Business Info -->
+            <div class="section-title">🏢 Informations du Business</div>
+
+            <div class="form-group">
+                <label>Nom du Business *</label>
+                <input type="text" id="biz-name" placeholder="Ex: Clinique Santé+" oninput="updatePreview()" />
+            </div>
+            <div class="form-group">
+                <label>Secteur d'activité</label>
+                <select id="biz-sector" onchange="autoFillPrompt()">
+                    <option value="">Choisir le secteur...</option>
+                    <option value="clinic">🏥 Clinique / Cabinet médical</option>
+                    <option value="restaurant">🍽️ Restaurant / Café</option>
+                    <option value="salon">💇 Salon de coiffure / Beauté</option>
+                    <option value="auto">🚗 Garage / Auto</option>
+                    <option value="immo">🏠 Immobilier</option>
+                    <option value="coach">🧘 Coach / Consultant</option>
+                    <option value="boutique">🛍️ Boutique / E-commerce</option>
+                    <option value="hotel">🏨 Hôtel / Tourisme</option>
+                    <option value="juridique">⚖️ Cabinet juridique</option>
+                    <option value="autre">📋 Autre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description courte du business</label>
+                <input type="text" id="biz-desc" placeholder="Ex: Clinique moderne spécialisée en médecine générale..."
+                    oninput="updatePreview()" />
+            </div>
+            <div class="form-group">
+                <label>Services proposés (séparés par des virgules)</label>
+                <input type="text" id="biz-services"
+                    placeholder="Ex: Consultation, Radiologie, Dentisterie, Nutrition" />
+            </div>
+            <div class="form-group">
+                <label>Horaires d'ouverture</label>
+                <input type="text" id="biz-hours" placeholder="Ex: Lun-Ven 8h-20h, Sam 9h-17h, Dim fermé" />
+            </div>
+            <div class="form-group">
+                <label>Adresse / Ville</label>
+                <input type="text" id="biz-address" placeholder="Ex: 123 Bd Mohammed V, Casablanca" />
+            </div>
+            <div class="form-group">
+                <label>Téléphone de contact</label>
+                <input type="text" id="biz-phone" placeholder="Ex: +212 522 000 000" />
+            </div>
+            <div class="form-group">
+                <label>Langue principale des clients</label>
+                <select id="biz-lang">
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="ar">🇲🇦 Arabe / Darija</option>
+                    <option value="en">🇬🇧 Anglais</option>
+                    <option value="multi">🌍 Multilingue (Français + Darija + Anglais)</option>
+                </select>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Widget Appearance -->
+            <div class="section-title">🎨 Apparence du Widget</div>
+
+            <div class="form-group">
+                <label>Message de bienvenue *</label>
+                <input type="text" id="welcome-msg" placeholder="👋 Bonjour! Comment puis-je vous aider?"
+                    oninput="updatePreview()" />
+            </div>
+            <div class="form-group">
+                <label>Couleur principale</label>
+                <div class="color-row">
+                    <input type="color" id="color-pick" value="#6366f1" oninput="syncColor(this.value)" />
+                    <input type="text" id="color-text" value="#6366f1" placeholder="#6366f1"
+                        oninput="syncColor(this.value)" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Position du widget</label>
+                <div class="radio-group">
+                    <label class="radio-opt active" id="pos-right-label" onclick="setPos('right')">
+                        <input type="radio" name="pos" value="right" checked />
+                        ➡️ Droite
+                    </label>
+                    <label class="radio-opt" id="pos-left-label" onclick="setPos('left')">
+                        <input type="radio" name="pos" value="left" />
+                        ⬅️ Gauche
+                    </label>
+                </div>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Advanced -->
+            <div class="section-title">🤖 Comportement de l'IA</div>
+
+            <div class="form-group">
+                <label>Instructions personnalisées (System Prompt)</label>
+                <textarea id="system-prompt" placeholder="Décrivez comment l'IA doit se comporter..."></textarea>
+            </div>
+            <div class="form-group"
+                style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:14px;margin-bottom:18px">
+                <div style="font-size:11px;font-weight:700;color:#22c55e;margin-bottom:6px">🔒 SÉCURISÉ — La clé API est
+                    stockée sur le serveur uniquement</div>
+                <div style="font-size:12px;color:var(--muted)">Votre clé Pollinations est configurée dans Firebase. Elle
+                    n'apparaîtra jamais dans le code client.</div>
+            </div>
+            <div class="form-group">
+                <label>URL Google Apps Script (pour Google Calendar)</label>
+                <input type="text" id="google-webhook" placeholder="https://script.google.com/macros/s/YOUR_ID/exec" />
+            </div>
+
+            <button class="generate-btn" onclick="generateCode()">
+                ✨ Générer mon code d'intégration
+            </button>
+        </div>
+
+        <!-- ═══════════ PREVIEW SIDE ═══════════ -->
+        <div class="preview-side">
+            <div class="preview-header">
+                <span>Aperçu</span>
+                <div class="preview-tabs">
+                    <button class="p-tab active" onclick="showTab('preview',this)">👁️ Prévisualisation</button>
+                    <button class="p-tab" onclick="showTab('code',this)">📋 Code</button>
+                    <button class="p-tab" onclick="showTab('rdvs',this)">📅 RDVs</button>
+                </div>
+            </div>
+
+            <div class="preview-body">
+
+                <!-- TAB: PREVIEW -->
+                <div id="tab-preview">
+                    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Aperçu en temps réel de votre
+                        chatbot:</p>
+                    <div class="chat-preview-wrap">
+                        <div id="cp-header" class="cp-header"
+                            style="background:linear-gradient(135deg,#6366f1,#4f46e5)">
+                            <div class="cp-av">🤖</div>
+                            <div>
+                                <div class="cp-name" id="cp-name-text">Mon Business</div>
+                                <div class="cp-status">
+                                    <div class="cp-dot"></div>En ligne maintenant
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cp-messages">
+                            <div class="cp-msg bot">
+                                <div class="cp-msg-av" id="cp-av-bot" style="background:#6366f1">🤖</div>
+                                <div class="cp-bubble" id="cp-welcome-bubble">👋 Bonjour! Comment puis-je vous aider?
+                                </div>
+                            </div>
+                            <div class="cp-msg user">
+                                <div class="cp-msg-av">👤</div>
+                                <div class="cp-bubble" id="cp-user-bubble">Je veux prendre un rendez-vous</div>
+                            </div>
+                            <div class="cp-msg bot">
+                                <div class="cp-msg-av" id="cp-av-bot2" style="background:#6366f1">🤖</div>
+                                <div class="cp-bubble">Bien sûr! Je vous prépare un formulaire 📅</div>
+                            </div>
+                        </div>
+                        <div class="cp-input-row">
+                            <div class="cp-inp">Écrivez votre message...</div>
+                            <div class="cp-send" id="cp-send-btn" style="background:#6366f1">➤</div>
+                        </div>
+                    </div>
+
+                    <!-- Business summary card -->
+                    <div id="biz-summary"
+                        style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;display:none;margin-top:16px">
+                        <div
+                            style="font-size:11px;color:var(--primary-light);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+                            📋 Résumé du Business</div>
+                        <div id="summary-content" style="font-size:13px;color:var(--muted);line-height:1.8"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: CODE -->
+                <div id="tab-code" style="display:none" id="code-section">
+                    <div
+                        style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--primary-light)">
+                        💡 Collez ce code dans le <strong>&lt;head&gt;</strong> de votre site web
+                    </div>
+                    <div class="code-wrap">
+                        <div class="code-top">
+                            <div class="code-dots">
+                                <div class="cd" style="background:#ff5f57"></div>
+                                <div class="cd" style="background:#ffbd2e"></div>
+                                <div class="cd" style="background:#28ca41"></div>
+                            </div>
+                            <span class="code-label">index.html — &lt;head&gt;</span>
+                        </div>
+                        <pre class="embed-code" id="embed-output"><!-- Cliquez sur "Générer mon code" --></pre>
+                        <button class="copy-btn" onclick="copyEmbed()">📋 Copier le code</button>
+                    </div>
+                    <div
+                        style="margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px">
+                        <div style="font-size:12px;font-weight:700;margin-bottom:10px">📁 Fichiers à uploader sur votre
+                            serveur:</div>
+                        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)">
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <span
+                                    style="background:rgba(99,102,241,.15);color:var(--primary-light);padding:2px 8px;border-radius:5px;font-family:monospace;font-size:11px">widget.js</span>
+                                <span>Le moteur du chatbot (dans le même dossier que votre HTML)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: RDVs -->
+                <div id="tab-rdvs" style="display:none">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                        <div style="font-size:13px;font-weight:600">Rendez-vous récents</div>
+                        <div style="font-size:11px;color:var(--muted)">Données de démo</div>
+                    </div>
+                    <div class="db-section">
+                        <div class="db-header">📅 Liste des RDVs</div>
+                        <table class="db-table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Date & Heure</th>
+                                    <th>Service</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight:600">Fatima Alaoui</div>
+                                        <div style="color:var(--muted);font-size:11px">+212 661 234 567</div>
+                                    </td>
+                                    <td>
+                                        <div>7 Mar 2026</div>
+                                        <div style="color:var(--muted);font-size:11px">10:00</div>
+                                    </td>
+                                    <td>Consultation</td>
+                                    <td><span class="badge new">Nouveau</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight:600">Karim Lahlou</div>
+                                        <div style="color:var(--muted);font-size:11px">+212 662 987 654</div>
+                                    </td>
+                                    <td>
+                                        <div>8 Mar 2026</div>
+                                        <div style="color:var(--muted);font-size:11px">14:30</div>
+                                    </td>
+                                    <td>Dentisterie</td>
+                                    <td><span class="badge confirmed">Confirmé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight:600">Sara Bennani</div>
+                                        <div style="color:var(--muted);font-size:11px">+212 660 111 222</div>
+                                    </td>
+                                    <td>
+                                        <div>10 Mar 2026</div>
+                                        <div style="color:var(--muted);font-size:11px">09:00</div>
+                                    </td>
+                                    <td>Nutrition</td>
+                                    <td><span class="badge new">Nouveau</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div
+                        style="margin-top:16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:14px;font-size:12px;color:var(--primary-light)">
+                        📊 Pour avoir les vraies données: connectez <strong>Google Sheets</strong> via le webhook Google
+                        Apps Script dans la configuration.
+                    </div>
+                </div>
+
+            </div><!-- /preview-body -->
+        </div><!-- /preview-side -->
+
+    </div><!-- /layout -->
+
+    <div id="toast"></div>
+
+    <script>
+        // ── TEMPLATES PAR SECTEUR ──
+        const SECTOR_PROMPTS = {
+            clinic: {
+                services: "Consultation générale, Dentisterie, Radiologie, Analyses sanguines, Nutrition, Pédiatrie",
+                hours: "Lun-Ven 8h-20h, Sam 9h-17h, Dim fermé",
+                prompt: (n, d, s, h, a, p, l) => `Tu es un assistant professionnel et chaleureux pour ${n}, une clinique médicale${d ? ' — ' + d : ''}. Tu aides les patients avec leurs questions sur nos services (${s || 'consultations médicales'}). Nos horaires: ${h || 'Lun-Ven 8h-20h'}. ${a ? 'Adresse: ' + a + '.' : ''} ${p ? 'Tél: ' + p + '.' : ''} Quand un patient veut prendre RDV, collecte: nom complet, numéro de téléphone, date et heure souhaitées, type de consultation. Sois empathique et professionnel. ${l === 'multi' ? "Réponds en français, arabe ou darija selon la langue du patient." : l === 'ar' ? "Réponds en arabe ou darija." : l === 'en' ? "Respond in English." : 'Réponds en français.'}`
+            },
+            restaurant: {
+                services: "Déjeuner, Dîner, Livraison à domicile, Réservation de table, Événements privés",
+                hours: "Tous les jours 12h-23h",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}, un restaurant${d ? ' — ' + d : ''}. Tu aides les clients à réserver une table, commander en ligne ou obtenir des informations sur le menu. Services: ${s || 'restaurant et livraison'}. Horaires: ${h || '12h-23h'}. ${p ? 'Tél: ' + p : ''} Pour une réservation, demande: nom, nombre de personnes, date et heure.`
+            },
+            salon: {
+                services: "Coupe, Coloration, Coiffage, Soins capillaires, Manucure, Maquillage",
+                hours: "Mar-Sam 9h-19h, Dim-Lun fermé",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant(e) de ${n}, salon de beauté${d ? ' — ' + d : ''}. Tu aides les clientes à prendre RDV pour nos prestations: ${s || 'coiffure, beauté'}. Horaires: ${h || 'Mar-Sam 9h-19h'}. ${p ? 'Tél: ' + p : ''} Pour un RDV, demande: prénom, service souhaité, date et heure préférée.`
+            },
+            auto: {
+                services: "Révision, Vidange, Réparation freins, Pneumatiques, Diagnostic électronique",
+                hours: "Lun-Sam 8h-18h",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}, garage automobile${d ? ' — ' + d : ''}. Tu aides les clients à prendre RDV pour réparations et entretiens: ${s || 'mécanique générale'}. Horaires: ${h || 'Lun-Sam 8h-18h'}. ${p ? 'Tél: ' + p : ''} Pour un RDV, demande: nom, véhicule, type de panne/entretien, date souhaitée.`
+            },
+            immo: {
+                services: "Vente appartements, Location, Gestion locative, Estimation immobilière",
+                hours: "Lun-Sam 9h-18h",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}, agence immobilière${d ? ' — ' + d : ''}. Tu aides les clients à trouver un bien, estimer leur propriété ou prendre RDV. Services: ${s || 'vente et location'}. Pour RDV, demande: nom, téléphone, type de projet (achat/vente/location), budget et date préférée.`
+            },
+            coach: {
+                services: "Coaching individuel, Ateliers groupe, Formations, Séances en ligne",
+                hours: "Sur RDV uniquement",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant(e) de ${n}${d ? ', ' + d : ''}. Tu aides les clients à prendre RDV pour des séances de coaching ou formations: ${s || 'coaching et consulting'}. Pour un RDV, demande: prénom, email ou téléphone, objectif, disponibilités.`
+            },
+            boutique: {
+                services: "Vente en ligne, Click & Collect, Livraison, Service après-vente",
+                hours: "Lun-Sam 9h-20h",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}, boutique${d ? ' — ' + d : ''}. Tu aides les clients avec leurs questions sur les produits, commandes et livraisons. Services: ${s || 'vente et livraison'}. ${p ? 'Tél: ' + p : ''} Si un client veut commander, aide-le à trouver le bon produit.`
+            },
+            hotel: {
+                services: "Réservation chambre, Spa, Restaurant, Excursions, Transferts aéroport",
+                hours: "Réception 24h/24",
+                prompt: (n, d, s, h, a, p, l) => `Tu es le concierge virtuel de ${n}${d ? ', ' + d : ''}. Tu aides les clients à réserver une chambre, obtenir des infos sur les services de l'hôtel et planifier leur séjour. Services: ${s || 'hébergement et restauration'}. Pour une réservation, demande: nom, dates d'arrivée et départ, nombre de personnes, type de chambre.`
+            },
+            juridique: {
+                services: "Consultation juridique, Rédaction contrats, Droit des affaires, Droit pénal",
+                hours: "Lun-Ven 9h-18h",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}, cabinet d'avocats${d ? ' — ' + d : ''}. Tu accueilles les clients et prends les RDV pour consultations juridiques dans les domaines: ${s || 'droit général'}. Pour RDV, demande: nom complet, téléphone, type de problème juridique, date préférée. Rappelle toujours que les informations données ne remplacent pas un avis juridique professionnel.`
+            },
+            autre: {
+                services: "",
+                hours: "",
+                prompt: (n, d, s, h, a, p, l) => `Tu es l'assistant de ${n}${d ? ', ' + d : ''}. Tu aides les clients avec leurs questions sur les services${s ? ': ' + s : ''}. ${h ? 'Horaires: ' + h + '.' : ''} ${p ? 'Tél: ' + p + '.' : ''} Quand un client veut prendre RDV, collecte: nom, téléphone, service souhaité, date et heure. Sois professionnel et amical. ${l === 'multi' ? "Réponds en français, arabe ou darija selon la langue du patient." : ''}`
+            }
+        };
+
+        let currentPos = 'right';
+
+        function autoFillPrompt() {
+            const sector = document.getElementById('biz-sector').value;
+            if (!sector || !SECTOR_PROMPTS[sector]) return;
+            const tpl = SECTOR_PROMPTS[sector];
+            if (tpl.services && !document.getElementById('biz-services').value)
+                document.getElementById('biz-services').value = tpl.services;
+            if (tpl.hours && !document.getElementById('biz-hours').value)
+                document.getElementById('biz-hours').value = tpl.hours;
+            buildPrompt();
+        }
+
+        function buildPrompt() {
+            const sector = document.getElementById('biz-sector').value;
+            if (!sector || !SECTOR_PROMPTS[sector]) return;
+            const n = document.getElementById('biz-name').value || 'Mon Business';
+            const d = document.getElementById('biz-desc').value;
+            const s = document.getElementById('biz-services').value;
+            const h = document.getElementById('biz-hours').value;
+            const a = document.getElementById('biz-address').value;
+            const p = document.getElementById('biz-phone').value;
+            const l = document.getElementById('biz-lang').value;
+            document.getElementById('system-prompt').value = SECTOR_PROMPTS[sector].prompt(n, d, s, h, a, p, l);
+        }
+
+        document.getElementById('biz-name').addEventListener('input', buildPrompt);
+        document.getElementById('biz-services').addEventListener('input', buildPrompt);
+        document.getElementById('biz-hours').addEventListener('input', buildPrompt);
+        document.getElementById('biz-address').addEventListener('input', buildPrompt);
+        document.getElementById('biz-phone').addEventListener('input', buildPrompt);
+        document.getElementById('biz-lang').addEventListener('change', buildPrompt);
+
+        function updatePreview() {
+            const name = document.getElementById('biz-name').value || 'Mon Business';
+            const welcome = document.getElementById('welcome-msg').value || '👋 Bonjour! Comment puis-je vous aider?';
+            document.getElementById('cp-name-text').textContent = name;
+            document.getElementById('cp-welcome-bubble').textContent = welcome;
+
+            // update summary
+            const desc = document.getElementById('biz-desc').value;
+            const services = document.getElementById('biz-services').value;
+            const hours = document.getElementById('biz-hours').value;
+            const address = document.getElementById('biz-address').value;
+            const phone = document.getElementById('biz-phone').value;
+
+            if (name !== 'Mon Business' || desc || services || hours) {
+                const summary = document.getElementById('biz-summary');
+                summary.style.display = 'block';
+                let html = '';
+                if (desc) html += `<div><b>📌</b> ${desc}</div>`;
+                if (services) html += `<div><b>🔧 Services:</b> ${services}</div>`;
+                if (hours) html += `<div><b>🕐 Horaires:</b> ${hours}</div>`;
+                if (address) html += `<div><b>📍</b> ${address}</div>`;
+                if (phone) html += `<div><b>📞</b> ${phone}</div>`;
+                document.getElementById('summary-content').innerHTML = html;
+            }
+        }
+
+        function syncColor(val) {
+            document.getElementById('color-pick').value = val;
+            document.getElementById('color-text').value = val;
+            // Update preview
+            const els = [
+                document.getElementById('cp-header'),
+                document.getElementById('cp-av-bot'),
+                document.getElementById('cp-av-bot2'),
+                document.getElementById('cp-send-btn'),
+                document.getElementById('cp-user-bubble'),
+            ];
+            document.getElementById('cp-header').style.background = `linear-gradient(135deg,${val},${shadeColor(val, -20)})`;
+            document.getElementById('cp-av-bot').style.background = val;
+            const av2 = document.getElementById('cp-av-bot2'); if (av2) av2.style.background = val;
+            document.getElementById('cp-send-btn').style.background = val;
+            document.getElementById('cp-user-bubble').style.background = val;
+        }
+
+        function shadeColor(color, percent) {
+            let R = parseInt(color.substring(1, 3), 16);
+            let G = parseInt(color.substring(3, 5), 16);
+            let B = parseInt(color.substring(5, 7), 16);
+            R = Math.min(255, Math.max(0, Math.round(R * (100 + percent) / 100)));
+            G = Math.min(255, Math.max(0, Math.round(G * (100 + percent) / 100)));
+            B = Math.min(255, Math.max(0, Math.round(B * (100 + percent) / 100)));
+            return '#' + R.toString(16).padStart(2, '0') + G.toString(16).padStart(2, '0') + B.toString(16).padStart(2, '0');
+        }
+
+        function setPos(pos) {
+            currentPos = pos;
+            document.getElementById('pos-right-label').classList.toggle('active', pos === 'right');
+            document.getElementById('pos-left-label').classList.toggle('active', pos === 'left');
+        }
+
+        function showTab(tab, btn) {
+            ['tab-preview', 'tab-code', 'tab-rdvs'].forEach(id => {
+                document.getElementById(id).style.display = id === 'tab-' + tab ? '' : 'none';
+            });
+            document.querySelectorAll('.p-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        async function generateCode() {
+            buildPrompt();
+            const name = document.getElementById('biz-name').value.trim() || 'Mon Business';
+            const welcome = document.getElementById('welcome-msg').value.trim() || '👋 Bonjour! Comment puis-je vous aider?';
+            const color = document.getElementById('color-text').value.trim() || '#6366f1';
+            const pos = currentPos;
+            const webhook = document.getElementById('google-webhook').value.trim() || '';
+            const prompt = document.getElementById('system-prompt').value.trim() || '';
+            const sector = document.getElementById('biz-sector').value || '';
+
+            if (!name || name === 'Mon Business') {
+                showToast('⚠️ Entrez le nom de votre business!');
+                document.getElementById('biz-name').focus();
+                return;
+            }
+
+            const btn = document.querySelector('.generate-btn');
+            btn.textContent = '⏳ Enregistrement...';
+            btn.disabled = true;
+
+            // Generate unique clientId
+            const clientId = crypto.randomUUID();
+
+            try {
+                // Save config to Firestore (prompt & settings stay on server)
+                if (window._db && window._firestoreOps) {
+                    const { doc, setDoc } = window._firestoreOps;
+                    await setDoc(doc(window._db, 'businesses', clientId), {
+                        businessName: name,
+                        systemPrompt: prompt,
+                        welcomeMessage: welcome,
+                        color: color,
+                        position: pos,
+                        googleWebhook: webhook,
+                        sector: sector,
+                        model: 'openai',
+                        createdAt: new Date().toISOString(),
+                    });
+                    showToast('✅ Configuration sauvegardée dans Firebase!');
+                } else {
+                    showToast('⚠️ Firebase non connecté — code généré localement');
+                }
+            } catch (e) {
+                console.warn('Firestore save error:', e);
+                showToast('⚠️ Erreur Firebase: ' + e.message);
+            }
+
+            // ✅ Embed code — NO api key, NO prompt, just clientId!
+            const WIDGET_URL = 'https://chatbotai.pages.dev/widget.js';
+            const code =
+                `<!-- 🤖 AgentChat AI — ${name} -->
+<!-- Collez ce code dans votre <head> -->
+<script>
+  window.AgentChatConfig = {
+    clientId:      "${clientId}",
+    businessName:  "${name}",
+    color:         "${color}",
+    position:      "${pos}"
+  };
+<\/script>
+<script src="${WIDGET_URL}" defer><\/script>
+<!-- Fin AgentChat -->`;
+
+            document.getElementById('embed-output').textContent = code;
+
+            // Show clientId info box
+            const infoBox = document.getElementById('client-id-box');
+            if (infoBox) {
+                infoBox.innerHTML = `<strong>🔑 Votre Client ID:</strong> <code style="color:#818cf8;font-family:monospace">${clientId}</code><br/><span style="font-size:11px;color:var(--muted)">Conservez cet ID pour retrouver vos RDVs.</span>`;
+                infoBox.style.display = 'block';
+            }
+
+            btn.textContent = '✅ Code généré!';
+            setTimeout(() => { btn.textContent = '✨ Générer mon code d\'intégration'; btn.disabled = false; }, 3000);
+            showTab('code', document.querySelectorAll('.p-tab')[1]);
+        }
+
+        function copyEmbed() {
+            const code = document.getElementById('embed-output').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ Copié!';
+                showToast('📋 Code copié dans le presse-papier!');
+                setTimeout(() => btn.textContent = '📋 Copier le code', 2000);
+            });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Load real appointments from Firestore for RDVs tab
+        async function loadAppointments(clientId) {
+            if (!window._db || !clientId) return;
+            const { collection, getDocs, query, where, orderBy, limit } = window._firestoreOps;
+            const q = query(
+                collection(window._db, 'appointments'),
+                where('clientId', '==', clientId),
+                orderBy('createdAt', 'desc'),
+                limit(20)
+            );
+            const snap = await getDocs(q);
+            const tbody = document.querySelector('.db-table tbody');
+            if (tbody && !snap.empty) {
+                tbody.innerHTML = '';
+                snap.forEach(d => {
+                    const r = d.data();
+                    const tr = document.createElement('tr');
+                    const dt = r.datetime ? new Date(r.datetime).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+                    tr.innerHTML = `<td><div style="font-weight:600">${r.name}</div><div style="color:var(--muted);font-size:11px">${r.phone}</div></td>
+                      <td>${dt}</td><td>${r.service || '—'}</td>
+                      <td><span class="badge ${r.status === 'new' ? 'new' : 'confirmed'}">${r.status === 'new' ? 'Nouveau' : 'Confirmé'}</span></td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // Init defaults
+        document.getElementById('welcome-msg').value = '👋 Bonjour! Comment puis-je vous aider?';
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Démo — AgentChat AI sur votre site</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Simulated website */
+        header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 40px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .logo span {
+            color: #6366f1;
+        }
+
+        nav a {
+            margin-left: 24px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #1e293b;
+        }
+
+        .hero-demo {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            padding: 80px 40px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero-demo h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .hero-demo p {
+            font-size: 18px;
+            opacity: .85;
+            margin-bottom: 28px;
+        }
+
+        .demo-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            margin-bottom: 40px;
+        }
+
+        .main-content {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .service-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .service-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .service-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .hours-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .hour-row {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .hour-row strong {
+            color: #1e293b;
+            font-weight: 600;
+            display: block;
+            font-size: 13px;
+        }
+
+        .demo-notice {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: #4f46e5;
+            font-weight: 500;
+            text-align: center;
+            margin: 0 20px 20px;
+        }
+
+        footer {
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        footer a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        @media(max-width: 640px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-demo {
+                padding: 60px 20px;
+            }
+
+            .hero-demo h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+
+    <!-- ============================================
+       🤖 AGENTCHAT AI WIDGET — Copiez ces 3 lignes
+       dans le <head> de votre site!
+  ============================================= -->
+    <script>
+        window.AgentChatConfig = {
+            pollinationsKey: "sk_ZTT8xTrT1mXerAsG9SR4Y2W6gehLOIQV",
+            googleWebhook: "",   // ← Mettez votre URL Google Apps Script ici
+            businessName: "Clinique Santé Plus",
+            welcomeMessage: "👋 Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd'hui?",
+            color: "#6366f1",
+            position: "right",
+            systemPrompt: "You are a professional assistant for Clinique Santé Plus, a medical clinic. Help patients with their questions about our services (consultations, check-ups, dental, nutrition counseling). When a patient wants to book an appointment, help them fill in their details: name, phone number, preferred date/time, and type of consultation. Be warm, professional and empathetic. Respond in the same language the user speaks (French, Arabic, Darija, or English)."
+        };
+    </script>
+    <script src="widget.js" defer></script>
+    <!-- ============================================ -->
+</head>
+
+<body>
+
+    <!-- Simulated Business Website -->
+    <header>
+        <div class="logo">Clinique <span>Santé+</span></div>
+        <nav>
+            <a href="#">Accueil</a>
+            <a href="#">Services</a>
+            <a href="#">Médecins</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="hero-demo">
+        <div class="demo-tag">🎭 Page de démonstration</div>
+        <h1>Votre Santé, Notre Priorité</h1>
+        <p>Clinique moderne avec des spécialistes dédiés à votre bien-être.</p>
+        <p style="font-size:14px;opacity:.7">👉 Cliquez sur le bouton <strong>🤖</strong> en bas à droite pour tester le
+            chatbot!</p>
+    </div>
+
+    <div class="demo-notice">
+        🤖 <strong>Démo AgentChat AI</strong> — Ce chatbot est alimenté par Pollinations AI. Essayez de demander un
+        rendez-vous!
+    </div>
+
+    <div class="main-content">
+        <div class="card">
+            <h2>🏥 Nos Services</h2>
+            <p>Des soins complets pour toute la famille.</p>
+            <ul class="service-list">
+                <li>
+                    <div class="service-icon">🩺</div> Médecine générale
+                </li>
+                <li>
+                    <div class="service-icon">🦷</div> Dentisterie
+                </li>
+                <li>
+                    <div class="service-icon">🥗</div> Nutrition & Diététique
+                </li>
+                <li>
+                    <div class="service-icon">💊</div> Pharmacie intégrée
+                </li>
+                <li>
+                    <div class="service-icon">🔬</div> Analyses & Laboratoire
+                </li>
+                <li>
+                    <div class="service-icon">❤️</div> Cardiologie
+                </li>
+            </ul>
+        </div>
+        <div class="card">
+            <h2>🕐 Horaires d'ouverture</h2>
+            <p>Nous sommes là pour vous, 6 jours sur 7.</p>
+            <div class="hours-grid">
+                <div class="hour-row"><strong>Lundi – Vendredi</strong> 8h00 – 20h00</div>
+                <div class="hour-row"><strong>Samedi</strong> 9h00 – 17h00</div>
+                <div class="hour-row"><strong>Dimanche</strong> Fermé</div>
+                <div class="hour-row"><strong>Urgences</strong> 24h/7j</div>
+            </div>
+            <div style="margin-top:20px; padding-top:20px; border-top:1px solid #f1f5f9;">
+                <h2 style="margin-bottom:8px;font-size:17px">📍 Adresse</h2>
+                <p>123 Boulevard Mohammed V<br />Casablanca 20000, Maroc</p>
+            </div>
+            <div style="margin-top:16px; padding-top:16px; border-top:1px solid #f1f5f9;">
+                <h2 style="margin-bottom:8px;font-size:17px">📞 Téléphone</h2>
+                <p style="color:#6366f1;font-weight:600">+212 522 XXX XXX</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Clinique Santé+ — Démo by
+            <a href="index.html">AgentChat AI</a>.
+            Le widget chatbot est complètement gratuit à déployer!
+        </p>
+    </footer>
+
+</body>
+
+</html>

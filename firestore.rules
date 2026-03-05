@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Business configs — anyone can read (widget needs it), write open for MVP
+    match /businesses/{clientId} {
+      allow read: if true;
+      allow write: if true; // TODO: add Firebase Auth for production
+    }
+
+    // Appointments — anyone can write (widget), open read for MVP dashboard
+    match /appointments/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
