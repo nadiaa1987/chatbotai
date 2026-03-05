@@ -12,8 +12,10 @@
     position: "right",
   }, window.AgentChatConfig || {});
 
-  // Firebase Functions base URL
-  const API = "https://us-central1-ai-agent-chatbot-4f4b8.cloudfunctions.net";
+  // Firebase Functions base URL (2nd Gen / Cloud Run)
+  const API_CHAT = "https://chat-in2liw63qa-uc.a.run.app";
+  const API_CONFIG = "https://getconfig-in2liw63qa-uc.a.run.app";
+  const API_SAVE = "https://saveappointment-in2liw63qa-uc.a.run.app";
 
   // ─────────────────────────────────────────
   //  STATE
@@ -198,7 +200,7 @@
   // ─────────────────────────────────────────
   async function loadRemoteConfig() {
     try {
-      const r = await fetch(`${API}/getConfig?clientId=${CFG.clientId}`);
+      const r = await fetch(`${API_CONFIG}?clientId=${CFG.clientId}`);
       if (!r.ok) return;
       const d = await r.json();
       if (d.businessName) {
@@ -291,13 +293,17 @@
 
       if (CFG.clientId) {
         // ✅ SECURE — calls Firebase Function (key stays on server)
-        const r = await fetch(`${API}/chat`, {
+        const r = await fetch(API_CHAT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clientId: CFG.clientId, messages }),
         });
         const d = await r.json();
-        reply = d.choices?.[0]?.message?.content || "Désolé, une erreur s'est produite.";
+        if (!r.ok) {
+          reply = `⚠️ Erreur: ${d.error || "Le serveur est indisponible"}`;
+        } else {
+          reply = d.choices?.[0]?.message?.content || "Désolé, je ne peux pas répondre pour le moment.";
+        }
       } else {
         // Fallback: direct Pollinations (for demo/testing only)
         const key = CFG.pollinationsKey || "";
@@ -308,8 +314,12 @@
           headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
           body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 400 }),
         });
-        const d = await r.json();
-        reply = d.choices?.[0]?.message?.content || "Désolé, une erreur s'est produite.";
+        if (!r.ok) {
+           reply = "⚠️ Pollinations Error. Vérifiez votre clé.";
+        } else {
+          const d = await r.json();
+          reply = d.choices?.[0]?.message?.content || "Désolé, erreur de réponse AI.";
+        }
       }
 
       messages.push({ role: "assistant", content: reply });
@@ -372,7 +382,7 @@
 
     try {
       if (CFG.clientId) {
-        await fetch(`${API}/saveAppointment`, {
+        await fetch(API_SAVE, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clientId: CFG.clientId, name, phone, datetime: dt, service: svc }),

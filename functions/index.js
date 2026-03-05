@@ -15,43 +15,66 @@ const PKEY = () => process.env.POLLINATIONS_KEY || "";
 // ════════════════════════════════════════════════════
 exports.chat = functions.https.onRequest((req, res) => {
     cors(req, res, async () => {
-        if (req.method !== "POST")
-            return res.status(405).json({ error: "Method not allowed" });
+        try {
+            if (req.method !== "POST")
+                return res.status(405).json({ error: "Method not allowed" });
 
-        const { clientId, messages } = req.body;
-        if (!clientId || !messages)
-            return res.status(400).json({ error: "Missing clientId or messages" });
+            const { clientId, messages } = req.body;
+            console.log(`Chat request for client: ${clientId}`);
 
-        // Fetch business config
-        const snap = await db.collection("businesses").doc(clientId).get();
-        if (!snap.exists)
-            return res.status(404).json({ error: "Business not found" });
+            if (!clientId || !messages)
+                return res.status(400).json({ error: "Missing clientId or messages" });
 
-        const cfg = snap.data();
+            // Fetch business config
+            const docRef = db.collection("businesses").doc(clientId);
+            const snap = await docRef.get();
 
-        // Build full message list (system prompt stays on server)
-        const full = [
-            { role: "system", content: cfg.systemPrompt || "You are a helpful assistant." },
-            ...messages,
-        ];
+            if (!snap.exists) {
+                console.error(`Business not found in Firestore: ${clientId}`);
+                return res.status(404).json({ error: "Business not found" });
+            }
 
-        // Call Pollinations
-        const r = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${PKEY()}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                model: cfg.model || "openai",
-                messages: full,
-                temperature: 0.7,
-                max_tokens: 500,
-            }),
-        });
+            const cfg = snap.data();
+            console.log(`Config found for ${cfg.businessName}. System prompt length: ${cfg.systemPrompt?.length || 0}`);
 
-        const data = await r.json();
-        res.json(data);
+            // Build full message list
+            const full = [
+                { role: "system", content: cfg.systemPrompt || "You are a helpful assistant." },
+                ...messages,
+            ];
+
+            const pollKey = PKEY();
+            console.log(`Calling Pollinations API. Key present: ${!!pollKey}`);
+
+            // Call Pollinations
+            const response = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${pollKey}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    model: cfg.model || "openai",
+                    messages: full,
+                    temperature: 0.7,
+                    max_tokens: 800,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Pollinations API error: ${response.status} - ${errorText}`);
+                return res.status(502).json({ error: "Pollinations API error", details: errorText });
+            }
+
+            const data = await response.json();
+            console.log("Pollinations success. Content excerpt:", data.choices?.[0]?.message?.content?.substring(0, 50));
+            res.json(data);
+
+        } catch (err) {
+            console.error("Internal Server Error:", err);
+            res.status(500).json({ error: "Internal server error", message: err.message });
+        }
     });
 });
 
