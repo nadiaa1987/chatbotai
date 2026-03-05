@@ -159,27 +159,27 @@
     const panel = mk("div", { id: "ac-panel", role: "dialog" });
     panel.innerHTML = `
       <div id="ac-head">
-        <div id="ac-av">🤖</div>
+        <div id="ac-av">🛎️</div>
         <div style="flex:1">
           <div id="ac-head-name">${CFG.businessName}</div>
-          <div id="ac-head-st"><div id="ac-dot"></div>En ligne maintenant</div>
+          <div id="ac-head-st"><div id="ac-dot"></div>En ligne (Concierge AI)</div>
         </div>
         <button id="ac-x">✕</button>
       </div>
       <div id="ac-msgs">
         <div id="ac-typing" class="ac-row bot">
-          <div class="ac-av">🤖</div>
+          <div class="ac-av">🛎️</div>
           <div class="ac-dots"><span></span><span></span><span></span></div>
         </div>
       </div>
       <div id="ac-qr"></div>
       <div id="ac-inp-wrap">
-        <textarea id="ac-inp" placeholder="Écrivez votre message..." rows="1"></textarea>
+        <textarea id="ac-inp" placeholder="Posez une question au concierge..." rows="1"></textarea>
         <button id="ac-send">
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
-      <div id="ac-foot">Propulsé par <a href="https://pollinations.ai" target="_blank">AgentChat AI</a></div>`;
+      <div id="ac-foot">Propulsé par <a href="#" target="_blank">HotelChat AI</a></div>`;
     document.body.appendChild(panel);
 
     document.getElementById("ac-x").onclick = toggleChat;
@@ -248,7 +248,7 @@
     const msgs = document.getElementById("ac-msgs");
     const typing = document.getElementById("ac-typing");
     const row = mk("div", { class: `ac-row ${role}` });
-    const av = mk("div", { class: "ac-av" }); av.textContent = role === "bot" ? "🤖" : "👤";
+    const av = mk("div", { class: "ac-av" }); av.textContent = role === "bot" ? "🛎️" : "👤";
     const bbl = mk("div", { class: "ac-bbl" }); bbl.textContent = text;
     row.appendChild(av); row.appendChild(bbl);
     msgs.insertBefore(row, typing);
@@ -315,7 +315,7 @@
           body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 400 }),
         });
         if (!r.ok) {
-           reply = "⚠️ Pollinations Error. Vérifiez votre clé.";
+          reply = "⚠️ Pollinations Error. Vérifiez votre clé.";
         } else {
           const d = await r.json();
           reply = d.choices?.[0]?.message?.content || "Désolé, erreur de réponse AI.";
