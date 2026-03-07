@@ -47,6 +47,8 @@ exports.chat = functions.https.onRequest((req, res) => {
             console.log(`Calling Pollinations API. Key present: ${!!pollKey}`);
 
             // Call Pollinations
+            console.log(`Payload for Pollinations: Model=${cfg.model || "openai"}, Messages count=${full.length}`);
+
             const response = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -54,32 +56,36 @@ exports.chat = functions.https.onRequest((req, res) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    model: cfg.model || "mistral", // Switched to mistral for better stability
+                    model: cfg.model || "openai", // OpenAI is generally the most stable on their proxy
                     messages: full,
                     temperature: 0.7,
-                    max_tokens: 800,
+                    max_tokens: 300, // Reduced to discourage long paragraphs
                 }),
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error(`Pollinations API error: ${response.status} - ${errorText}`);
-                return res.status(502).json({ error: "Pollinations API error", details: errorText });
+                console.error(`Pollinations ERROR [${response.status}]: ${errorText}`);
+                return res.status(response.status).json({
+                    error: "Pollinations API error",
+                    status: response.status,
+                    details: errorText.substring(0, 100)
+                });
             }
 
             const data = await response.json();
             const content = data.choices?.[0]?.message?.content;
 
             if (!content) {
-                console.error("Pollinations returned empty content.");
-                return res.status(500).json({ error: "Empty response from AI" });
+                console.error("Pollinations returned empty content object:", JSON.stringify(data));
+                return res.status(500).json({ error: "AI returned empty content" });
             }
 
-            console.log("Pollinations success. Content excerpt:", content.substring(0, 50));
+            console.log("Pollinations Success. Reply length:", content.length);
             res.json(data);
 
         } catch (err) {
-            console.error("Internal Server Error:", err);
+            console.error("CRITICAL Backend Error:", err);
             res.status(500).json({ error: "Internal server error", message: err.message });
         }
     });

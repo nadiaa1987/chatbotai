@@ -283,7 +283,7 @@
     await getBotReply(text);
   }
 
-  async function getBotReply(userText) {
+  async function getBotReply(userText, retry = true) {
     isTyping = true;
     document.getElementById("ac-send").disabled = true;
     showTyping();
@@ -298,12 +298,20 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clientId: CFG.clientId, messages }),
         });
-        const d = await r.json();
+
+        let d;
+        try { d = await r.json(); } catch (e) { d = { error: "Non-JSON response" }; }
+
         if (r.ok && d.choices?.[0]?.message?.content) {
           reply = d.choices[0].message.content;
           success = true;
         } else {
-          reply = "I'm sorry, I'm having trouble connecting to the concierge desk. Could you please try again?";
+          console.error("Backend error:", d);
+          if (retry) {
+            console.log("Retrying...");
+            return getBotReply(userText, false);
+          }
+          reply = `I'm sorry, I encountered a technical issue (${d.status || r.status}). Please try again shortly.`;
         }
       } else {
         const key = CFG.pollinationsKey || "";
@@ -312,14 +320,14 @@
         const r = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
           method: "POST",
           headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 400 }),
+          body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 1000 }),
         });
         const d = await r.json();
         if (r.ok && d.choices?.[0]?.message?.content) {
           reply = d.choices[0].message.content;
           success = true;
         } else {
-          reply = "I'm sorry, an error occurred. Please check your connection.";
+          reply = "I'm sorry, I'm currently unavailable. Please check your connection.";
         }
       }
 
@@ -334,14 +342,14 @@
           pendingAppt = true;
           setTimeout(showApptForm, 600);
         } else {
-          const lower = reply.toLowerCase();
-          if (lower.includes("rendez-vous") || lower.includes("booking") || lower.includes("prenota"))
-            showQR(["📅 Book Now", "❓ More Info"]);
+          showQR(["📅 Book Now", "❓ More Info"]);
         }
       }
     } catch (e) {
+      console.error("Network error:", e);
       hideTyping();
-      addMsg("bot", "⚠️ Connection impossible. Please try again.");
+      if (retry) return getBotReply(userText, false);
+      addMsg("bot", "⚠️ Connection error. Please try again.");
     } finally {
       isTyping = false;
       document.getElementById("ac-send").disabled = false;
