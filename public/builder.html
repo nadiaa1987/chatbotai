@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>HotelChat AI — Le Concierge Virtuel pour Hôtels</title>
+    <title>HotelChat AI — The Virtual Concierge for Hotels</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <style>
@@ -521,115 +521,114 @@
             <div class="logo-icon">🛎️</div>
             HotelChat <span>AI</span>
         </div>
-        <div style="font-size: 13px; color: var(--muted); font-weight: 500;">Concierge Virtuel — Panel Administrateur
+        <div style="font-size: 13px; color: var(--muted); font-weight: 500;">Virtual Concierge — Admin Panel
         </div>
     </nav>
 
     <div class="layout">
         <!-- FORM SIDE -->
         <div class="form-side" id="form-container">
-            <h1>Configurez votre Concierge</h1>
-            <p class="subtitle">Créez un assistant intelligent et humain pour votre hôtel.</p>
+            <h1>Configure your Concierge</h1>
+            <p class="subtitle">Create a smart and human assistant for your hotel.</p>
 
             <!-- 1. IDENTITE -->
-            <div class="section-title">✨ Identité de l'Hôtel</div>
+            <div class="section-title">✨ Hotel Identity</div>
             <div class="form-group">
-                <label>Nom de l'Hôtel</label>
+                <label>Hotel Name</label>
                 <input type="text" id="biz-name" placeholder="Ex: Hilton Palace Casablanca" oninput="updatePreview()" />
             </div>
 
             <div class="form-group">
-                <label>Description & Ambiance</label>
-                <textarea id="biz-desc" placeholder="Hôtel de luxe avec vue sur mer, style moderne..."
+                <label>Description & Vibe</label>
+                <textarea id="biz-desc" placeholder="Luxury hotel with sea view, modern style..."
                     oninput="updatePreview()"></textarea>
             </div>
 
             <div class="form-group">
-                <label>Message de Bienvenue (Pop-up)</label>
-                <input type="text" id="welcome-msg" placeholder="Ex: Bienvenue au Palace! Comment puis-je vous aider?"
+                <label>Welcome Message (Pop-up)</label>
+                <input type="text" id="welcome-msg" placeholder="Ex: Welcome to the Palace! How can I help you?"
                     oninput="updatePreview()" />
             </div>
 
             <!-- 2. CHAMBRES & PRIX -->
-            <div class="section-title">🛏️ Chambres & Tarifs</div>
+            <div class="section-title">🛏️ Rooms & Rates</div>
             <div class="form-group">
-                <label>Types de Chambres & Prix (Détaillez les catégories)</label>
+                <label>Room Types & Prices (Detail the categories)</label>
                 <textarea id="hotel-rooms"
-                    placeholder="Chambre Simple: 800 DH, Double: 1200 DH, Suite Junior: 2500 DH..."></textarea>
+                    placeholder="Single Room: $80, Double: $120, Junior Suite: $250..."></textarea>
             </div>
             <div class="form-group">
-                <label>Vues Disponibles</label>
-                <input type="text" id="hotel-views" placeholder="Vue sur mer, Vue sur jardin, Vue sur piscine..." />
+                <label>Available Views</label>
+                <input type="text" id="hotel-views" placeholder="Sea view, Garden view, Pool view..." />
             </div>
             <div class="form-group">
-                <label>Climatisation/Chauffage</label>
-                <input type="text" id="hotel-ac" placeholder="Climatisation réversible dans toutes les chambres..." />
+                <label>AC/Heating</label>
+                <input type="text" id="hotel-ac" placeholder="Reversible air conditioning in all rooms..." />
             </div>
 
             <!-- 3. POLITIQUES -->
             <div class="section-title">🔑 Check-in & Check-out</div>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Heure de Check-in</label>
-                    <input type="text" id="hotel-checkin" placeholder="Ex: 14h00" />
+                    <label>Check-in Time</label>
+                    <input type="text" id="hotel-checkin" placeholder="Ex: 2:00 PM" />
                 </div>
                 <div class="form-group">
-                    <label>Heure de Check-out</label>
-                    <input type="text" id="hotel-checkout" placeholder="Ex: 12h00" />
+                    <label>Check-out Time</label>
+                    <input type="text" id="hotel-checkout" placeholder="Ex: 12:00 PM" />
                 </div>
             </div>
             <div class="form-group">
-                <label>Late Check-out (Possibilité & Prix)</label>
-                <input type="text" id="hotel-late-check" placeholder="Possible jusqu'à 16h, supplément 300 DH..." />
+                <label>Late Check-out (Possibility & Price)</label>
+                <input type="text" id="hotel-late-check" placeholder="Possible until 4 PM, extra $30..." />
             </div>
             <div class="form-group">
-                <label>Politique d'Annulation</label>
-                <textarea id="hotel-cancel" placeholder="Annulation gratuite jusqu'à 24h avant l'arrivée..."></textarea>
+                <label>Cancellation Policy</label>
+                <textarea id="hotel-cancel" placeholder="Free cancellation up to 24h before arrival..."></textarea>
             </div>
 
             <!-- 4. RESTAURATION -->
-            <div class="section-title">🍳 Repas & Restaurant</div>
+            <div class="section-title">🍳 Dining & Restaurant</div>
             <div class="form-group">
-                <label>Petit-Déjeuner (Inclus ? Prix ? Horaires ?)</label>
+                <label>Breakfast (Included? Price? Hours?)</label>
                 <textarea id="hotel-breakfast"
-                    placeholder="Buffet inclus, servi de 7h à 10h30 au restaurant L'Oasis. Si non inclus: 120 DH..."></textarea>
+                    placeholder="Buffet included, served from 7:00 AM to 10:30 AM at the Oasis restaurant. If not included: $15..."></textarea>
             </div>
             <div class="form-group">
                 <label>Restaurant & Cuisine</label>
                 <textarea id="hotel-restau"
-                    placeholder="Restaurant gastronomique marocain, ouvert 12h-23h. Cuisine internationale aussi..."></textarea>
+                    placeholder="Gourmet Moroccan restaurant, open 12 PM - 11 PM. International cuisine also available..."></textarea>
             </div>
             <div class="form-group">
                 <label>Room Service</label>
-                <input type="text" id="hotel-room-svc" placeholder="Disponible 24h/24, menu disponible en chambre..." />
+                <input type="text" id="hotel-room-svc" placeholder="Available 24/7, menu available in room..." />
             </div>
 
             <!-- 5. SERVICES & LOISIRS -->
-            <div class="section-title">🏊 Services & Loisirs</div>
+            <div class="section-title">🏊 Services & Leisure</div>
             <div class="form-group">
-                <label>Piscine / Spa / Gym (Horaires)</label>
+                <label>Pool / Spa / Gym (Hours)</label>
                 <textarea id="hotel-leisure"
-                    placeholder="Piscine extérieure (9h-19h), Spa & Hammam (10h-21h), Salle de sport 24h/24..."></textarea>
+                    placeholder="Outdoor pool (9 AM - 7 PM), Spa & Hammam (10 AM - 9 PM), 24/7 Gym..."></textarea>
             </div>
             <div class="form-group">
-                <label>Parking & Transport (Taxi, Navette)</label>
+                <label>Parking & Transport (Taxi, Shuttle)</label>
                 <textarea id="hotel-transport"
-                    placeholder="Parking gratuit sécurisé. Navette aéroport sur demande (200 DH). Service Taxi 24h/24..."></textarea>
+                    placeholder="Secure free parking. Airport shuttle on request ($20). 24/7 Taxi service..."></textarea>
             </div>
             <div class="form-group">
                 <label>Wi-Fi & Code</label>
-                <input type="text" id="hotel-wifi" placeholder="Wi-Fi gratuit partout. Code: PALACE2026" />
+                <input type="text" id="hotel-wifi" placeholder="Free Wi-Fi everywhere. Code: PALACE2026" />
             </div>
             <div class="form-group">
-                <label>Animaux & Fumeurs</label>
-                <input type="text" id="hotel-pets"
-                    placeholder="Animaux non admis. Chambres non-fumeurs uniquement..." />
+                <label>Pets & Smoking</label>
+                <input type="text" id="hotel-pets" placeholder="Pets not allowed. Non-smoking rooms only..." />
             </div>
 
             <!-- 6. LOOK & FEEL -->
-            <div class="section-title">🎨 Personnalisation</div>
+            <div class="section-title">🎨 Customization</div>
             <div class="form-group">
-                <label>Couleur du thème</label>
+                <label>Theme Color</label>
                 <div class="color-row">
                     <input type="color" id="biz-color" class="color-box" value="#c4a77d" oninput="updatePreview()" />
                     <input type="text" id="color-text" value="#c4a77d" style="font-family:monospace; font-size: 13px"
@@ -641,34 +640,34 @@
                 <label>Position</label>
                 <div class="radio-group">
                     <div class="radio-opt active" id="pos-right-label" onclick="setPos('right')">
-                        Droite
+                        Right
                     </div>
                     <div class="radio-opt" id="pos-left-label" onclick="setPos('left')">
-                        Gauche
+                        Left
                     </div>
                 </div>
             </div>
 
             <!-- 7. WEBHOOK -->
-            <div class="section-title">🔗 Intégrations</div>
+            <div class="section-title">🔗 Integrations</div>
             <div class="form-group">
-                <label>Google Apps Script Webhook (Calendrier/Sheets)</label>
+                <label>Google Apps Script Webhook (Calendar/Sheets)</label>
                 <input type="text" id="google-webhook" placeholder="https://script.google.com/macros/s/..." />
             </div>
 
             <div class="divider"></div>
 
-            <button class="generate-btn" onclick="generateCode()">✨ GÉNÉRER MON CONCIERGE VIRTUEL</button>
+            <button class="generate-btn" onclick="generateCode()">✨ GENERATE MY VIRTUAL CONCIERGE</button>
         </div>
 
         <!-- PREVIEW SIDE -->
         <div class="preview-side">
             <div class="preview-header">
-                Aperçu
+                Preview
                 <div class="preview-tabs">
                     <button class="p-tab active" onclick="showTab('preview', this)">Design</button>
                     <button class="p-tab" onclick="showTab('code', this)">📦 Code</button>
-                    <button class="p-tab" onclick="showTab('rdvs', this)">📅 Résas</button>
+                    <button class="p-tab" onclick="showTab('rdvs', this)">📅 Bookings</button>
                 </div>
             </div>
 
@@ -679,24 +678,24 @@
                         <div class="cp-header" id="cp-head-bg">
                             <div class="cp-av">🛎️</div>
                             <div style="flex:1">
-                                <div class="cp-name" id="cp-name-preview">Votre Hôtel</div>
+                                <div class="cp-name" id="cp-name-preview">Your Hotel</div>
                                 <div class="cp-status">
-                                    <div class="cp-dot"></div>En ligne (Concierge AI)
+                                    <div class="cp-dot"></div>Online (AI Concierge)
                                 </div>
                             </div>
                         </div>
                         <div class="cp-messages">
                             <div class="cp-msg">
-                                <div class="cp-bubble" id="cp-welcome-bubble">👋 Bonjour! Comment puis-je vous aider
-                                    pour votre séjour?</div>
+                                <div class="cp-bubble" id="cp-welcome-bubble">👋 Hello! How can I help you
+                                    with your stay?</div>
                             </div>
                             <div class="cp-msg user" style="margin-top: 10px">
-                                <div class="cp-bubble" style="background:#c4a77d; color:#fff">Quel est le prix pour une
-                                    nuit ?</div>
+                                <div class="cp-bubble" style="background:#c4a77d; color:#fff">What's the price for one
+                                    night?</div>
                             </div>
                         </div>
                         <div class="cp-input-row">
-                            <div class="cp-inp">Écrivez ici...</div>
+                            <div class="cp-inp">Type here...</div>
                             <div class="cp-send" id="cp-sc-btn">➤</div>
                         </div>
                     </div>
@@ -705,7 +704,7 @@
                         style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:20px;display:none">
                         <div
                             style="font-size:11px;color:var(--primary-light);font-weight:700;text-transform:uppercase;margin-bottom:12px">
-                            📋 Résumé de la configuration</div>
+                            📋 Configuration Summary</div>
                         <div id="summary-content" style="font-size:13px;color:var(--muted);line-height:1.7"></div>
                     </div>
 
@@ -718,31 +717,32 @@
                 <div id="tab-code" style="display:none">
                     <div
                         style="background:rgba(196,167,125,0.08);border:1px solid rgba(196,167,125,0.2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--primary-light)">
-                        💡 Collez ce code dans le <strong>&lt;head&gt;</strong> de votre site pour activer le concierge.
+                        💡 Paste this code into the <strong>&lt;head&gt;</strong> of your site to activate the
+                        concierge.
                     </div>
                     <div class="code-wrap">
                         <div class="code-top">HTML SNIPPET</div>
-                        <pre class="embed-code" id="embed-output"><!-- Cliquez sur "Générer mon code" --></pre>
-                        <button class="copy-btn" onclick="copyEmbed()">📋 Copier</button>
+                        <pre class="embed-code" id="embed-output"><!-- Click on "Generate my code" --></pre>
+                        <button class="copy-btn" onclick="copyEmbed()">📋 Copy</button>
                     </div>
                 </div>
 
                 <!-- TAB: RDVs -->
                 <div id="tab-rdvs" style="display:none">
-                    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Réservations & Demandes</div>
+                    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Bookings & Inquiries</div>
                     <div style="background:var(--surface2);border-radius:12px;overflow:hidden">
                         <table style="width:100%;font-size:12px;text-align:left;border-collapse:collapse">
                             <thead style="background:rgba(255,255,255,0.03);color:var(--muted)">
                                 <tr>
-                                    <th style="padding:12px">Client</th>
+                                    <th style="padding:12px">Guest</th>
                                     <th style="padding:12px">Date</th>
-                                    <th style="padding:12px">Statut</th>
+                                    <th style="padding:12px">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="rdv-rows">
                                 <tr>
-                                    <td colspan="3" style="padding:30px;text-align:center;color:var(--muted)">Aucune
-                                        donnée reçue</td>
+                                    <td colspan="3" style="padding:30px;text-align:center;color:var(--muted)">No
+                                        data received</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -778,8 +778,8 @@
         let currentPos = 'right';
 
         function updatePreview() {
-            const name = document.getElementById('biz-name').value || 'Votre Hôtel';
-            const welcome = document.getElementById('welcome-msg').value || '👋 Bonjour! Comment puis-je vous aider?';
+            const name = document.getElementById('biz-name').value || 'Your Hotel';
+            const welcome = document.getElementById('welcome-msg').value || '👋 Hello! How can I help you?';
             const color = document.getElementById('biz-color').value;
 
             document.getElementById('cp-name-preview').textContent = name;
@@ -807,7 +807,7 @@
         }
 
         function buildPrompt() {
-            const n = document.getElementById('biz-name').value || 'L\'Hôtel';
+            const n = document.getElementById('biz-name').value || 'The Hotel';
             const d = document.getElementById('biz-desc').value;
             const rooms = document.getElementById('hotel-rooms').value;
             const views = document.getElementById('hotel-views').value;
@@ -822,39 +822,39 @@
             const pool = document.getElementById('hotel-leisure').value;
             const cancel = document.getElementById('hotel-cancel').value;
 
-            return `Tu es le Concierge Virtuel humain, élégant et très chaleureux de ${n}. ${d ? 'Description: ' + d : ''}
-Ton ton doit être irrésistiblement accueillant, comme un réceptionniste de luxe qui discute pour mettre à l'aise (idi o ijib m3ah fi lhadar).
-Ne réponds jamais avec des phrases courtes et froides. Sois vivant !
+            return `You are the human, elegant, and very warm Virtual Concierge of ${n}. ${d ? 'Description: ' + d : ''}
+Your tone should be irresistibly welcoming, like a luxury receptionist chatting to make guests feel at ease (idi o ijib m3ah fi lhadar).
+Never respond with short, cold sentences. Be alive!
 
-Voici les informations sur l'hôtel pour tes réponses :
-- Chambres & Prix : ${rooms || 'Consulter la réception'}
-- Vues : ${views || 'Vue magnifique'}
-- Wi-Fi : ${wifi || 'Disponible partout'}
-- Check-in : ${cin || '14h'}, Check-out : ${cout || '12h'}. Late check-out : ${late || 'Sur demande'}.
-- Petit-déjeuner : ${bfast || 'Au restaurant'}
-- Restaurant : ${rest || 'Menu varié'}
-- Parking & Transport : ${park || 'Disponible'}
-- Services (Piscine/Spa/Gym) : ${pool || 'Installations modernes'}
-- Animaux/Fumeurs : ${pets}
-- Annulation : ${cancel}
+Here is the hotel information for your answers:
+- Rooms & Prices: ${rooms || 'Consult reception'}
+- Views: ${views || 'Magnificent view'}
+- Wi-Fi: ${wifi || 'Available everywhere'}
+- Check-in: ${cin || '2:00 PM'}, Check-out: ${cout || '12:00 PM'}. Late check-out: ${late || 'Upon request'}.
+- Breakfast: ${bfast || 'At the restaurant'}
+- Restaurant: ${rest || 'Varied menu'}
+- Parking & Transport: ${park || 'Available'}
+- Services (Pool/Spa/Gym): ${pool || 'Modern facilities'}
+- Pets/Smoking: ${pets}
+- Cancellation: ${cancel}
 
-RÈGLES D'OR :
-1. "Idi o ijib": Si le client demande le prix, donne le prix puis demande-lui s'il vient pour un voyage d'affaires ou de plaisir.
-2. Hospitalité marocaine : Utilise des expressions chaleureuses (Marhba, Lalla, Sidi).
-3. Langue : Si on te parle en Darija, réponds en Darija fluide avec politesse. Si en français, sois élégant.
-4. Réservation : Si le client veut réserver, demande-lui son nom, téléphone et ses dates avec enthousiasme.`;
+GOLDEN RULES:
+1. "Idi o ijib": If the guest asks for the price, give the price and then ask if they are coming for business or pleasure.
+2. Moroccan Hospitality (if applicable): Use warm expressions (Marhba, Lalla, Sidi).
+3. Language: If spoken to in Darija, respond in fluid Darija with politeness. If in English, be elegant.
+4. Reservation: If the guest wants to book, ask for their name, phone, and dates with enthusiasm.`;
         }
 
         async function generateCode() {
             const systemPrompt = buildPrompt();
-            const name = document.getElementById('biz-name').value.trim() || 'Mon Hôtel';
-            const welcome = document.getElementById('welcome-msg').value.trim() || '👋 Bonjour! Comment puis-je vous aider?';
+            const name = document.getElementById('biz-name').value.trim() || 'My Hotel';
+            const welcome = document.getElementById('welcome-msg').value.trim() || '👋 Hello! How can I help you?';
             const color = document.getElementById('biz-color').value || '#c4a77d';
             const webhook = document.getElementById('google-webhook').value.trim() || '';
             const clientId = crypto.randomUUID();
 
             const btn = document.querySelector('.generate-btn');
-            btn.textContent = '⏳ Configuration en cours...';
+            btn.textContent = '⏳ Saving configuration...';
             btn.disabled = true;
 
             try {
@@ -871,15 +871,15 @@ RÈGLES D'OR :
                         model: 'openai',
                         createdAt: new Date().toISOString(),
                     });
-                    showToast('✨ Concierge configuré avec succès !');
+                    showToast('✨ Concierge configured successfully!');
                 }
             } catch (e) {
                 console.warn('Firestore error:', e);
-                showToast('⚠️ Erreur de sauvegarde.');
+                showToast('⚠️ Saving error.');
             }
 
             const WIDGET_URL = 'https://chatbotai-eor.pages.dev/widget.js';
-            const code = `<!-- 🛎️ HotelChat AI Snipet -->
+            const code = `<!-- 🛎️ HotelChat AI Snippet -->
 <script>
   window.AgentChatConfig = {
     clientId: "${clientId}",
@@ -892,12 +892,12 @@ RÈGLES D'OR :
 <!-- End HotelChat -->`;
 
             document.getElementById('embed-output').textContent = code;
-            document.getElementById('client-id-box').innerHTML = `<strong>🔑 Client ID:</strong> <code>${clientId}</code><br/>Gardez cet ID pour voir vos réservations.`;
+            document.getElementById('client-id-box').innerHTML = `<strong>🔑 Client ID:</strong> <code>${clientId}</code><br/>Keep this ID to see your bookings.`;
             document.getElementById('client-id-box').style.display = 'block';
 
-            btn.textContent = '✅ CONFIGURÉ !';
+            btn.textContent = '✅ CONFIGURED!';
             setTimeout(() => {
-                btn.textContent = '✨ GÉNÉRER MON CONCIERGE VIRTUEL';
+                btn.textContent = '✨ GENERATE MY VIRTUAL CONCIERGE';
                 btn.disabled = false;
             }, 3000);
 
@@ -907,7 +907,7 @@ RÈGLES D'OR :
         function copyEmbed() {
             const code = document.getElementById('embed-output').textContent;
             navigator.clipboard.writeText(code).then(() => {
-                showToast('📋 Code copié !');
+                showToast('📋 Code copied!');
             });
         }
 
