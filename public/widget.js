@@ -311,7 +311,8 @@
             console.log("Retrying...");
             return getBotReply(userText, false);
           }
-          reply = `I'm sorry, I encountered a technical issue (${d.status || r.status}). Please try again shortly.`;
+          const errDetail = d.message || d.error || `Status ${r.status}`;
+          reply = `I'm sorry, I encountered a technical issue (${errDetail}). Please try again shortly.`;
         }
       } else {
         const key = CFG.pollinationsKey || "";

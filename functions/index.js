@@ -8,6 +8,12 @@ const db = admin.firestore();
 // ── Pollinations key stored in .env ──
 const PKEY = () => process.env.POLLINATIONS_KEY || "";
 
+
+// Polyfill fetch if missing (older environments)
+if (typeof fetch === "undefined") {
+    global.fetch = require("node-fetch");
+}
+
 // ════════════════════════════════════════════════════
 //  1. CHAT  —  POST /chat
 //  Widget sends: { clientId, messages: [{role,content}] }
@@ -22,8 +28,8 @@ exports.chat = functions.https.onRequest((req, res) => {
             const { clientId, messages } = req.body;
             console.log(`Chat request for client: ${clientId}`);
 
-            if (!clientId || !messages)
-                return res.status(400).json({ error: "Missing clientId or messages" });
+            if (!clientId || !Array.isArray(messages))
+                return res.status(400).json({ error: "Missing clientId or invalid messages array" });
 
             // Fetch business config
             const docRef = db.collection("businesses").doc(clientId);
@@ -49,17 +55,17 @@ exports.chat = functions.https.onRequest((req, res) => {
             // Call Pollinations
             console.log(`Payload for Pollinations: Model=${cfg.model || "mistral"}, Messages count=${full.length}`);
 
+            const headers = { "Content-Type": "application/json" };
+            if (pollKey) headers["Authorization"] = `Bearer ${pollKey}`;
+
             const response = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
                 method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${pollKey}`,
-                    "Content-Type": "application/json",
-                },
+                headers,
                 body: JSON.stringify({
-                    model: cfg.model || "mistral", // Switched to mistral after discovering 'openai' uses reasoning tokens and returns empty content
+                    model: cfg.model || "mistral",
                     messages: full,
-                    temperature: 0.9, // Higher temperature for more human-like variety
-                    max_tokens: 150, // Very low tokens to force brevity
+                    temperature: 0.9,
+                    max_tokens: 300, // Increased slightly for stability
                 }),
             });
 
@@ -80,9 +86,15 @@ exports.chat = functions.https.onRequest((req, res) => {
                 // If content is empty but reasoning_tokens is high, it cut off
                 const rTokens = data.usage?.completion_tokens_details?.reasoning_tokens || 0;
                 console.error("Empty content. Reasoning tokens used:", rTokens);
-                return res.status(500).json({
-                    error: "AI Thinking Error",
-                    message: "AI used reasoning but ran out of tokens before replying. Switching to Mistral recommended."
+
+                // Instead of 500, return a friendly hint
+                return res.status(200).json({
+                    choices: [{
+                        message: {
+                            role: "assistant",
+                            content: "I'm sorry, I'm thinking too much but can't find words. Please try asking again or check my model settings (Mistral is recommended)."
+                        }
+                    }]
                 });
             }
 
