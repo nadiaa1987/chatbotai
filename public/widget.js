@@ -289,23 +289,23 @@
     showTyping();
 
     try {
-      let reply;
+      let reply = "";
+      let success = false;
 
       if (CFG.clientId) {
-        // ✅ SECURE — calls Firebase Function (key stays on server)
         const r = await fetch(API_CHAT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clientId: CFG.clientId, messages }),
         });
         const d = await r.json();
-        if (!r.ok) {
-          reply = `⚠️ Erreur: ${d.error || "Le serveur est indisponible"}`;
+        if (r.ok && d.choices?.[0]?.message?.content) {
+          reply = d.choices[0].message.content;
+          success = true;
         } else {
-          reply = d.choices?.[0]?.message?.content || "Désolé, je ne peux pas répondre pour le moment.";
+          reply = "I'm sorry, I'm having trouble connecting to the concierge desk. Could you please try again?";
         }
       } else {
-        // Fallback: direct Pollinations (for demo/testing only)
         const key = CFG.pollinationsKey || "";
         const sysPrompt = CFG.systemPrompt || "You are a helpful assistant.";
         const full = [{ role: "system", content: sysPrompt }, ...messages];
@@ -314,11 +314,12 @@
           headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
           body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 400 }),
         });
-        if (!r.ok) {
-          reply = "⚠️ Pollinations Error. Vérifiez votre clé.";
+        const d = await r.json();
+        if (r.ok && d.choices?.[0]?.message?.content) {
+          reply = d.choices[0].message.content;
+          success = true;
         } else {
-          const d = await r.json();
-          reply = d.choices?.[0]?.message?.content || "Désolé, erreur de réponse AI.";
+          reply = "I'm sorry, an error occurred. Please check your connection.";
         }
       }
 
@@ -326,21 +327,21 @@
       hideTyping();
       addMsg("bot", reply);
 
-      // Detect appointment intent
-      const apptKw = ["rendez-vous", "rdv", "réserver", "booking", "appointment", "موعد", "حجز", "mwa3ad", "7jez", "bghit njiw"];
-      if (!pendingAppt && apptKw.some(k => (userText + reply).toLowerCase().includes(k))) {
-        pendingAppt = true;
-        setTimeout(showApptForm, 600);
-      } else {
-        const lower = reply.toLowerCase();
-        if (lower.includes("rendez-vous") || lower.includes("réserver"))
-          showQR(["📅 Oui, je veux un RDV", "❓ Plus d'infos"]);
-        else if (lower.includes("autre chose") || lower.includes("besoin"))
-          showQR(["📅 Prendre RDV", "👋 Non merci"]);
+      // Detect appointment intent — ONLY IF SUCCESS
+      if (success) {
+        const apptKw = ["rendez-vous", "rdv", "réserver", "booking", "appointment", "موعد", "حجز", "mwa3ad", "7jez", "prenota", "prenotazione"];
+        if (!pendingAppt && apptKw.some(k => (userText + reply).toLowerCase().includes(k))) {
+          pendingAppt = true;
+          setTimeout(showApptForm, 600);
+        } else {
+          const lower = reply.toLowerCase();
+          if (lower.includes("rendez-vous") || lower.includes("booking") || lower.includes("prenota"))
+            showQR(["📅 Book Now", "❓ More Info"]);
+        }
       }
-    } catch {
+    } catch (e) {
       hideTyping();
-      addMsg("bot", "⚠️ Connexion impossible. Veuillez réessayer.");
+      addMsg("bot", "⚠️ Connection impossible. Please try again.");
     } finally {
       isTyping = false;
       document.getElementById("ac-send").disabled = false;
@@ -354,16 +355,31 @@
     const msgs = document.getElementById("ac-msgs");
     const typing = document.getElementById("ac-typing");
     const row = mk("div", { class: "ac-row bot" });
-    const av = mk("div", { class: "ac-av" }); av.textContent = "🤖";
+    const av = mk("div", { class: "ac-av" }); av.textContent = "🛎️";
     const card = mk("div", { class: "ac-appt" });
     const min = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+    // Auto-detect language briefly
+    const isIt = messages.some(m => m.content.toLowerCase().includes("ciao") || m.content.toLowerCase().includes("grazie"));
+    const isAr = messages.some(m => m.content.match(/[\u0600-\u06FF]/));
+
+    const labels = {
+      title: isIt ? "📅 Prenota ora" : (isAr ? "📅 حجز موعد" : "📅 Book Appointment"),
+      name: isIt ? "Nome" : (isAr ? "الاسم" : "Full Name"),
+      phone: isIt ? "Telefono" : (isAr ? "Telefono" : "Phone Number"),
+      date: isIt ? "Data e ora" : (isAr ? "التاريخ والوقت" : "Date & Time"),
+      svc: isIt ? "Servizio" : (isAr ? "الخدمة" : "Service"),
+      submit: isIt ? "Conferma" : (isAr ? "تأكيد الحجز" : "Confirm Booking")
+    };
+
     card.innerHTML = `
-      <h4>📅 Réserver un Rendez-vous</h4>
-      <div class="ac-f"><label>Votre nom</label><input type="text" id="appt-name" placeholder="Ex: Mohamed Alaoui"/></div>
-      <div class="ac-f"><label>Téléphone</label><input type="tel" id="appt-phone" placeholder="+212 6XX XXX XXX"/></div>
-      <div class="ac-f"><label>Date & Heure</label><input type="datetime-local" id="appt-dt" min="${min}T08:00"/></div>
-      <div class="ac-f"><label>Service souhaité</label><input type="text" id="appt-svc" placeholder="Ex: Consultation..."/></div>
-      <button class="ac-appt-btn" id="appt-submit">✅ Confirmer le Rendez-vous</button>`;
+      <h4>${labels.title}</h4>
+      <div class="ac-f"><label>👤 ${labels.name}</label><input type="text" id="appt-name" placeholder="..."/></div>
+      <div class="ac-f"><label>📱 ${labels.phone}</label><input type="tel" id="appt-phone" placeholder="..."/></div>
+      <div class="ac-f"><label>⏰ ${labels.date}</label><input type="datetime-local" id="appt-dt" min="${min}T08:00"/></div>
+      <div class="ac-f"><label>🛎️ ${labels.svc}</label><input type="text" id="appt-svc" placeholder="..."/></div>
+      <button class="ac-appt-btn" id="appt-submit">${labels.submit}</button>`;
+
     row.appendChild(av); row.appendChild(card);
     msgs.insertBefore(row, typing);
     scrollBot();
@@ -375,10 +391,10 @@
     const phone = document.getElementById("appt-phone")?.value.trim();
     const dt = document.getElementById("appt-dt")?.value;
     const svc = document.getElementById("appt-svc")?.value.trim();
-    if (!name || !phone || !dt) { showToast("⚠️ Remplissez tous les champs"); return; }
+    if (!name || !phone || !dt) { showToast("⚠️ Missing info"); return; }
 
     const btn = document.getElementById("appt-submit");
-    btn.textContent = "⏳ Envoi en cours..."; btn.disabled = true;
+    btn.textContent = "..."; btn.disabled = true;
 
     try {
       if (CFG.clientId) {
@@ -388,12 +404,12 @@
           body: JSON.stringify({ clientId: CFG.clientId, name, phone, datetime: dt, service: svc }),
         });
       }
-    } catch (e) { console.warn("Appointment save failed:", e); }
+    } catch (e) { }
 
-    btn.textContent = "✅ Confirmé!";
-    const dtFmt = new Date(dt).toLocaleString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
-    addMsg("bot", `✅ Parfait ${name}! Votre RDV est confirmé:\n\n📅 ${dtFmt}\n🔧 ${svc || "À définir"}\n📱 ${phone}\n\n📊 Enregistré dans notre système!`);
-    showQR(["❓ Autre question", "👋 Merci, au revoir"]);
+    btn.textContent = "✅";
+    setTimeout(() => {
+      addMsg("bot", "✅ Perfect! Your request has been sent to our desk.");
+    }, 500);
   }
 
   // ─────────────────────────────────────────

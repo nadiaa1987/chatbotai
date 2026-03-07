@@ -54,7 +54,7 @@ exports.chat = functions.https.onRequest((req, res) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    model: cfg.model || "openai",
+                    model: cfg.model || "mistral", // Switched to mistral for better stability
                     messages: full,
                     temperature: 0.7,
                     max_tokens: 800,
@@ -68,7 +68,14 @@ exports.chat = functions.https.onRequest((req, res) => {
             }
 
             const data = await response.json();
-            console.log("Pollinations success. Content excerpt:", data.choices?.[0]?.message?.content?.substring(0, 50));
+            const content = data.choices?.[0]?.message?.content;
+
+            if (!content) {
+                console.error("Pollinations returned empty content.");
+                return res.status(500).json({ error: "Empty response from AI" });
+            }
+
+            console.log("Pollinations success. Content excerpt:", content.substring(0, 50));
             res.json(data);
 
         } catch (err) {
