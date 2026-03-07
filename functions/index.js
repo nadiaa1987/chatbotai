@@ -47,7 +47,7 @@ exports.chat = functions.https.onRequest((req, res) => {
             console.log(`Calling Pollinations API. Key present: ${!!pollKey}`);
 
             // Call Pollinations
-            console.log(`Payload for Pollinations: Model=${cfg.model || "openai"}, Messages count=${full.length}`);
+            console.log(`Payload for Pollinations: Model=${cfg.model || "mistral"}, Messages count=${full.length}`);
 
             const response = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
                 method: "POST",
@@ -56,10 +56,10 @@ exports.chat = functions.https.onRequest((req, res) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    model: cfg.model || "openai", // OpenAI is generally the most stable on their proxy
+                    model: cfg.model || "mistral", // Switched to mistral after discovering 'openai' uses reasoning tokens and returns empty content
                     messages: full,
-                    temperature: 0.7,
-                    max_tokens: 300, // Reduced to discourage long paragraphs
+                    temperature: 0.9, // Higher temperature for more human-like variety
+                    max_tokens: 150, // Very low tokens to force brevity
                 }),
             });
 
@@ -77,8 +77,13 @@ exports.chat = functions.https.onRequest((req, res) => {
             const content = data.choices?.[0]?.message?.content;
 
             if (!content) {
-                console.error("Pollinations returned empty content object:", JSON.stringify(data));
-                return res.status(500).json({ error: "AI returned empty content" });
+                // If content is empty but reasoning_tokens is high, it cut off
+                const rTokens = data.usage?.completion_tokens_details?.reasoning_tokens || 0;
+                console.error("Empty content. Reasoning tokens used:", rTokens);
+                return res.status(500).json({
+                    error: "AI Thinking Error",
+                    message: "AI used reasoning but ran out of tokens before replying. Switching to Mistral recommended."
+                });
             }
 
             console.log("Pollinations Success. Reply length:", content.length);
