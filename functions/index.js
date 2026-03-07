@@ -62,10 +62,10 @@ exports.chat = functions.https.onRequest((req, res) => {
                 method: "POST",
                 headers,
                 body: JSON.stringify({
-                    model: cfg.model || "mistral",
+                    model: cfg.model || "mistral", // Switched to mistral after discovering 'openai' uses reasoning tokens and returns empty content
                     messages: full,
-                    temperature: 0.9,
-                    max_tokens: 1200, // Increased to allow reasoning models enough space
+                    temperature: 0.9, // Higher temperature for more human-like variety
+                    max_tokens: 80, // Very low tokens to physically force brevity
                 }),
             });
 
