@@ -260,7 +260,9 @@
 
   function showLanguageSelector() {
     const msgs = document.getElementById("ac-msgs");
-    msgs.innerHTML = ""; // Clear for selector
+    const typing = document.getElementById("ac-typing");
+    msgs.innerHTML = "";
+    msgs.appendChild(typing);
 
     // Hide input until language is picked
     document.getElementById("ac-inp-wrap").style.display = "none";
@@ -271,7 +273,7 @@
     bbl.textContent = "Please select your language to start chatting:";
 
     row.appendChild(av); row.appendChild(bbl);
-    msgs.appendChild(row);
+    msgs.insertBefore(row, typing);
 
     const wrap = mk("div", { class: "ac-lang-wrap" });
     const langs = [
@@ -287,13 +289,19 @@
       b.onclick = () => selectLang(l.id, l.label);
       wrap.appendChild(b);
     });
-    msgs.appendChild(wrap);
+    msgs.insertBefore(wrap, typing);
     scrollBot();
   }
 
   function selectLang(id, label) {
     selectedLang = id;
-    document.getElementById("ac-msgs").innerHTML = "";
+
+    // Clear UI but preserve the hidden typing indicator
+    const msgs = document.getElementById("ac-msgs");
+    const typing = document.getElementById("ac-typing");
+    msgs.innerHTML = "";
+    msgs.appendChild(typing);
+
     document.getElementById("ac-inp-wrap").style.display = "flex";
 
     const welcome = {
@@ -305,7 +313,10 @@
 
     const firstMsg = welcome[id] || CFG.welcomeMessage;
     addMsg("bot", firstMsg);
-    messages.push({ role: "system", content: `IMPORTANT: Client selected ${label}. Respond ONLY in ${label} for the rest of this conversation.` });
+
+    // History Tracking
+    messages.push({ role: "assistant", content: firstMsg });
+    messages.push({ role: "user", content: `[Guest selected ${label}. Continue ONLY in ${label}.]` });
 
     const qrs = {
       en: ["📅 Book Now", "💬 Question", "🕐 Hours", "📞 Contact"],
