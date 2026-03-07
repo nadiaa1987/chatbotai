@@ -288,6 +288,9 @@
     document.getElementById("ac-send").disabled = true;
     showTyping();
 
+    // Human feel: small delay before thinking
+    await new Promise(r => setTimeout(r, 800));
+
     try {
       let reply = "";
       let success = false;
@@ -299,7 +302,7 @@
         const r = await fetch(API_CHAT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ clientId: CFG.clientId, messages: prunedMessages }),
+          body: JSON.stringify({ clientId: CFG.clientId, messages }),
         });
 
         let d;
@@ -314,8 +317,7 @@
             console.log("Retrying...");
             return getBotReply(userText, false);
           }
-          const errDetail = d.message || d.error || `Status ${r.status}`;
-          reply = `I'm sorry, I encountered a technical issue (${errDetail}). Please try again shortly.`;
+          reply = `I'm sorry, I'm having a technical moment (${r.status}). Could you please repeat that?`;
         }
       } else {
         const key = CFG.pollinationsKey || "";
@@ -324,7 +326,7 @@
         const r = await fetch("https://gen.pollinations.ai/v1/chat/completions", {
           method: "POST",
           headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ model: "openai", messages: full, temperature: 0.7, max_tokens: 1000 }),
+          body: JSON.stringify({ model: "openai", messages: full, temperature: 0.9, max_tokens: 300 }),
         });
         const d = await r.json();
         if (r.ok && d.choices?.[0]?.message?.content) {
@@ -335,26 +337,32 @@
         }
       }
 
-      messages.push({ role: "assistant", content: reply });
-      hideTyping();
-      addMsg("bot", reply);
+      // Human feel: artificial typing time based on length
+      const delay = Math.min(Math.max(reply.length * 15, 600), 2000);
+      setTimeout(() => {
+        messages.push({ role: "assistant", content: reply });
+        hideTyping();
+        addMsg("bot", reply);
 
-      // Detect appointment intent — ONLY IF SUCCESS
-      if (success) {
-        const apptKw = ["rendez-vous", "rdv", "réserver", "booking", "appointment", "موعد", "حجز", "mwa3ad", "7jez", "prenota", "prenotazione"];
-        if (!pendingAppt && apptKw.some(k => (userText + reply).toLowerCase().includes(k))) {
-          pendingAppt = true;
-          setTimeout(showApptForm, 600);
-        } else {
-          showQR(["📅 Book Now", "❓ More Info"]);
+        // Detect appointment intent — ONLY IF SUCCESS
+        if (success) {
+          const apptKw = ["rendez-vous", "rdv", "réserver", "booking", "appointment", "موعد", "حجز", "mwa3ad", "7jez", "prenota", "prenotazione"];
+          if (!pendingAppt && apptKw.some(k => (userText + reply).toLowerCase().includes(k))) {
+            pendingAppt = true;
+            setTimeout(showApptForm, 600);
+          } else {
+            showQR(["📅 Book Now", "❓ More Info"]);
+          }
         }
-      }
+        isTyping = false;
+        document.getElementById("ac-send").disabled = false;
+      }, delay);
+
     } catch (e) {
       console.error("Network error:", e);
       hideTyping();
       if (retry) return getBotReply(userText, false);
       addMsg("bot", "⚠️ Connection error. Please try again.");
-    } finally {
       isTyping = false;
       document.getElementById("ac-send").disabled = false;
     }
