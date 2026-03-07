@@ -65,7 +65,7 @@ exports.chat = functions.https.onRequest((req, res) => {
                     model: cfg.model || "mistral",
                     messages: full,
                     temperature: 0.9,
-                    max_tokens: 300, // Increased slightly for stability
+                    max_tokens: 1200, // Increased to allow reasoning models enough space
                 }),
             });
 

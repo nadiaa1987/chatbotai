@@ -293,10 +293,13 @@
       let success = false;
 
       if (CFG.clientId) {
+        const historyLimit = 10;
+        const prunedMessages = messages.slice(-historyLimit);
+
         const r = await fetch(API_CHAT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ clientId: CFG.clientId, messages }),
+          body: JSON.stringify({ clientId: CFG.clientId, messages: prunedMessages }),
         });
 
         let d;
