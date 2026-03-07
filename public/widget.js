@@ -21,6 +21,7 @@
   //  STATE
   // ─────────────────────────────────────────
   let isOpen = false, isTyping = false;
+  let selectedLang = null;
   let messages = []; // NO system prompt here — backend adds it
   let pendingAppt = false;
 
@@ -136,6 +137,34 @@
       #ac-panel{width:calc(100vw - 16px);${CFG.position}:8px;bottom:84px;border-radius:16px}
       #ac-btn{${CFG.position}:16px;bottom:16px}
     }
+    .ac-lang-wrap {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      animation: ac-fi 0.3s ease;
+    }
+    .ac-lang-btn {
+      padding: 15px;
+      border: 1.5px solid var(--ac);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ac);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .ac-lang-btn:hover {
+      background: var(--ac);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .ac-lang-btn span { font-size: 20px; }
   `;
   document.head.appendChild(style);
 
@@ -223,13 +252,68 @@
     document.getElementById("ac-panel").classList.toggle("open", isOpen);
     document.getElementById("ac-badge").style.display = "none";
 
-    if (isOpen && messages.length === 0) {
-      setTimeout(() => {
-        addMsg("bot", CFG.welcomeMessage);
-        showQR(["📅 Prendre RDV", "💬 Question", "🕐 Horaires", "📞 Contact"]);
-      }, 350);
+    if (isOpen && !selectedLang && messages.length === 0) {
+      showLanguageSelector();
     }
     if (isOpen) setTimeout(() => document.getElementById("ac-inp").focus(), 300);
+  }
+
+  function showLanguageSelector() {
+    const msgs = document.getElementById("ac-msgs");
+    msgs.innerHTML = ""; // Clear for selector
+
+    // Hide input until language is picked
+    document.getElementById("ac-inp-wrap").style.display = "none";
+
+    const row = mk("div", { class: "ac-row bot" });
+    const av = mk("div", { class: "ac-av" }); av.textContent = "🛎️";
+    const bbl = mk("div", { class: "ac-bbl" });
+    bbl.textContent = "Please select your language to start chatting:";
+
+    row.appendChild(av); row.appendChild(bbl);
+    msgs.appendChild(row);
+
+    const wrap = mk("div", { class: "ac-lang-wrap" });
+    const langs = [
+      { id: "en", label: "English", icon: "🇬🇧" },
+      { id: "it", label: "Italiano", icon: "🇮🇹" },
+      { id: "fr", label: "Français", icon: "🇫🇷" },
+      { id: "nl", label: "Dutch", icon: "🇳🇱" }
+    ];
+
+    langs.forEach(l => {
+      const b = mk("button", { class: "ac-lang-btn" });
+      b.innerHTML = `<span>${l.icon}</span> ${l.label}`;
+      b.onclick = () => selectLang(l.id, l.label);
+      wrap.appendChild(b);
+    });
+    msgs.appendChild(wrap);
+    scrollBot();
+  }
+
+  function selectLang(id, label) {
+    selectedLang = id;
+    document.getElementById("ac-msgs").innerHTML = "";
+    document.getElementById("ac-inp-wrap").style.display = "flex";
+
+    const welcome = {
+      en: "Hi! How can I help you today?",
+      it: "Ciao! Come posso aiutarti oggi?",
+      fr: "Bonjour! Comment puis-je vous aider?",
+      nl: "Hallo! Hoe kan ik u vandaag helpen?"
+    };
+
+    const firstMsg = welcome[id] || CFG.welcomeMessage;
+    addMsg("bot", firstMsg);
+    messages.push({ role: "system", content: `IMPORTANT: Client selected ${label}. Respond ONLY in ${label} for the rest of this conversation.` });
+
+    const qrs = {
+      en: ["📅 Book Now", "💬 Question", "🕐 Hours", "📞 Contact"],
+      it: ["📅 Prenota", "💬 Domanda", "🕐 Orari", "📞 Contatti"],
+      fr: ["📅 Réserver", "💬 Question", "🕐 Horaires", "📞 Contact"],
+      nl: ["📅 Boek nu", "💬 Vraag", "🕐 Openingstijden", "📞 Contact"]
+    };
+    showQR(qrs[id] || ["📅 Book Now", "💬 Question"]);
   }
 
   function showBadge() {
