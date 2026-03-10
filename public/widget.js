@@ -83,8 +83,8 @@
     .ac-bbl{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;
       line-height:1.5;word-wrap:break-word}
     .ac-row.bot .ac-bbl{background:#fff;color:#1e293b;border-bottom-left-radius:4px;
-      box-shadow:0 1px 4px rgba(0,0,0,.07)}
-    .ac-row.user .ac-bbl{background:var(--ac);color:#fff;border-bottom-right-radius:4px}
+      box-shadow:0 1px 4px rgba(0,0,0,.07);text-align:left}
+    .ac-row.user .ac-bbl{background:var(--ac);color:#fff;border-bottom-right-radius:4px;text-align:left}
     #ac-typing{display:none;align-items:flex-end;gap:8px;animation:ac-fi .2s}
     #ac-typing.show{display:flex}
     .ac-dots{background:#fff;padding:12px 16px;border-radius:16px;border-bottom-left-radius:4px;
